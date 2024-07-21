@@ -1,47 +1,45 @@
 // Globals.h
 
-//#define FGCOLOR TFT_PURPLE+0x3000
-extern char16_t FGCOLOR;
+#define FGCOLOR TFT_GREEN
+// extern char16_t FGCOLOR;
 #define ALCOLOR TFT_RED
 #define BGCOLOR TFT_BLACK
 
 #include <Arduino.h>
-// #include <TFT_eSPI.h>
-// #include <functional>
+#include <TFT_eSPI.h>
+#include <functional>
 #include <vector>
-//#include <SPIFFS.h>
+#include <SPIFFS.h>
 // #include <LittleFS.h>
-// #include <NTPClient.h>
-// #include <Timezone.h>
-// #include <ESP32Time.h>
-// #include <EEPROM.h>
-#include <M5Cardputer.h>
-#include "M5GFX.h"
+#include <NTPClient.h>
+#include <Timezone.h>
+#include <ESP32Time.h>
+#include <EEPROM.h>
 
 
-#if defined (STICK_C_PLUS) || defined (STICK_C)
-  #include <AXP192.h>
-  extern AXP192 axp192;
-#endif
-
-// #if defined(CARDPUTER)
-//   #include <Keyboard.h>
-//   extern Keyboard_Class Keyboard;
+// #if defined (STICK_C_PLUS) || defined (STICK_C)
+//   #include <AXP192.h>
+//   extern AXP192 axp192;
 // #endif
 
+#if defined(CARDPUTER)
+  #include <Keyboard.h>
+  extern Keyboard_Class Keyboard;
+#endif
+
 // Declaração dos objetos TFT
-// extern TFT_eSPI tft;
-// extern TFT_eSprite sprite;
-// extern TFT_eSprite draw;
+extern TFT_eSPI tft;
+extern TFT_eSprite sprite;
+extern TFT_eSprite draw;
 
 extern char timeStr[10];
 
 extern bool clock_set;
 extern time_t localTime;
 extern struct tm* timeInfo;
-// extern ESP32Time rtc;
-// extern NTPClient timeClient;
-// extern Timezone myTZ;
+extern ESP32Time rtc;
+extern NTPClient timeClient;
+extern Timezone myTZ;
 
 extern int prog_handler;    // 0 - Flash, 1 - LittleFS, 2 - Download
 
@@ -75,7 +73,7 @@ extern int RfTx;
 
 extern int RfRx;
 
-void readFGCOLORFromEEPROM();
+// void readFGCOLORFromEEPROM();
 
 void backToMenu();
 

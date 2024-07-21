@@ -1,4 +1,14 @@
+#ifndef GPS_H
+#define GPS_H
+
 #include <WebServer.h>
 
-void setupGPS(char* ssid, char* password, WebServer& server);
-void handleLocation(WebServer& server);
+extern double latitude;
+extern double longitude;
+
+extern WebServer server;
+
+void setupGPS(String ssid, String password);
+void handleLocation();
+
+#endif

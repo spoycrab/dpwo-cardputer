@@ -1,0 +1,1 @@
+esptool --chip esp32s3 merge_bin --output dpwo.bin 0x0 .pio\build\M5Cardputer\bootloader.bin 0x8000 .pio\build\M5Cardputer\partitions.bin 0x10000 .pio\build\M5Cardputer\firmware.bin

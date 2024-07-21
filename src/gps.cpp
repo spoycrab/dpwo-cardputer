@@ -4,8 +4,13 @@
 #include <ArduinoJson.h>
 #include "gps.h"
 
-#include "esp_log.h"
-void setupGPS(char* ssid, char* password, WebServer& server){
+WebServer server(80);
+double latitude;
+double longitude;
+
+void handleLocation();
+
+void setupGPS(String ssid, String password){
     WiFi.begin(ssid, password);
 
     while (WiFi.status() != WL_CONNECTED) {
@@ -15,9 +20,12 @@ void setupGPS(char* ssid, char* password, WebServer& server){
 
     Serial.println("Connected to WiFi");
     Serial.println(WiFi.localIP());
+
+    server.on("/location", HTTP_POST, handleLocation);
+    server.begin();
 }
 
-void handleLocation(WebServer& server) {
+void handleLocation() {
     if (server.hasArg("plain") == false) {
         server.send(400, "text/plain", "Body not received");
         return;
@@ -34,8 +42,8 @@ void handleLocation(WebServer& server) {
         return;
     }
 
-    double latitude = doc["latitude"];
-    double longitude = doc["longitude"];
+    latitude = doc["latitude"];
+    longitude = doc["longitude"];
 
     Serial.print("Latitude: ");
     Serial.println(latitude);
