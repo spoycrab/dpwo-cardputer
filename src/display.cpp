@@ -304,12 +304,20 @@ void drawIntro(){
 
 void drawGPSInfo()
 {
-  // drawMainBorder();
+  drawMainBorder();
   tft.setCursor(30,42);tft.print("SSID: ");if(wifiConnected) {tft.print(WiFi.SSID());}else {tft.print("Nao Conectado");}
   tft.setCursor(30,42+(1*17));tft.print("Logintude: "+ String(longitude, 7));
   tft.setCursor(30,42+(2*17));tft.print("Latitude: "+ String(latitude, 7));
   // tft.setCursor(30,93);tft.print("teste3: 192.168.0.13");
 }
+
+void drawDPWOinfo(){
+  drawMainBorder();
+  displayRedStripe("NEGRESCO TESTE");
+  // tft.setCursor(30,42+(1*17));tft.print("TESTE NEGRESCO");
+
+}
+
 
 /***************************************************************************************
 ** Function name: getBattery()

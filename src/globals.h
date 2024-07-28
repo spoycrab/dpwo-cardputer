@@ -1,6 +1,6 @@
 // Globals.h
 
-#define FGCOLOR TFT_GREEN
+#define FGCOLOR TFT_DARKGREEN
 // extern char16_t FGCOLOR;
 #define ALCOLOR TFT_RED
 #define BGCOLOR TFT_BLACK
@@ -10,17 +10,12 @@
 #include <functional>
 #include <vector>
 #include <SPIFFS.h>
-// #include <LittleFS.h>
+
 #include <NTPClient.h>
 #include <Timezone.h>
 #include <ESP32Time.h>
 #include <EEPROM.h>
-
-
-// #if defined (STICK_C_PLUS) || defined (STICK_C)
-//   #include <AXP192.h>
-//   extern AXP192 axp192;
-// #endif
+#include <dpwo.h>
 
 #if defined(CARDPUTER)
   #include <Keyboard.h>

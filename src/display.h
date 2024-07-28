@@ -54,6 +54,7 @@ void drawCfg(int x, int y);
 
 void drawIntro();
 void drawGPSInfo();
+void drawDPWOinfo();
 
 #define bruce_small_width 60
 #define bruce_small_height 34

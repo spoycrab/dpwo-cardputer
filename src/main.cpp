@@ -55,6 +55,7 @@ void setup()
     resetTftDisplay();
 
     getBrightness();
+    setBrightness(10);
 }
 
 void loop()
@@ -64,38 +65,90 @@ void loop()
     int opt = 6;
     while (1)
     {
-        if(wifiConnected){
-            server.handleClient();
-        }
-       
-       
-        switch (index){
-            case 0:
-                if(redraw)drawIntro();
-                redraw = false;
-                break;
-            default:
-                if(redraw)drawMainBorder();
-                drawGPSInfo();
-                redraw = false;
-                break;
-        }
+        // if(wifiConnected){
+        //     server.handleClient();
+        // }
+        // switch (index){
+        //     case 0:                  
+        //         if(redraw){drawIntro();redraw = false;}
+        //         Keyboard.update();
+        //         if (Keyboard.isChange())
+        //         {
+        //             if (Keyboard.isKeyPressed(KEY_ENTER))
+        //             {
+        //                 wifiConnectMenu();
+        //                 setupGPS(ssid, pwd);
+        //                 wifiConnected = true;
+        //                 delay(200);
+        //                 index++; // pular para proxima tela
+        //                 redraw = true;
+        //                 Serial.println(ssid);
+        //                 Serial.println(pwd);
+        //             }
+        //         }
+        //         break;
+        //     case 1:
+        //         if(redraw){drawGPSInfo();redraw = false;}
+        //         Keyboard.update();
+        //         if (Keyboard.isChange())
+        //         {
+        //             if (Keyboard.isKeyPressed(KEY_ENTER))
+        //             {
+        //                 tft.fillScreen(BGCOLOR);
+        //                 redraw = true;
+        //                 index++;
+        //             }
+        //         }
+        //         break;
+        //     case 2: //teste
+        //         if(redraw){drawDPWOinfo();redraw = false;}
+        //         Keyboard.update();
+        //         if (Keyboard.isChange())
+        //         {
+        //             if (Keyboard.isKeyPressed(KEY_ENTER))
+        //             {
+        //                 tft.fillScreen(BGCOLOR);
+        //                 redraw = true;
+        //                 index--;
+        //             }
+        //         }
+        //         break;
+        // }
+
+
+        // switch (index){
+        //     case 0:
+        //         if(redraw)drawIntro();
+        //         redraw = false;
+        //         break;
+        //     default:
+        //         if(redraw)drawMainBorder();
+        //         drawGPSInfo();
+        //         redraw = false;
+        //         break;
+        // }
+        // delay(200);
         
-        delay(200);
-        
+        // Keyboard.update();
+        // if(Keyboard.isChange()){
+        //     if(Keyboard.isKeyPressed(KEY_ENTER)){
+        //         wifiConnectMenu();
+        //         setupGPS(ssid,pwd);
+        //         wifiConnected = true;
+        //         delay(200);
+        //         index++;//pular para proxima tela
+        //         redraw = true;
+        //         Serial.println(ssid);
+        //         Serial.println(pwd);
+        //     }
+        // }
 
         Keyboard.update();
         if(Keyboard.isChange()){
             if(Keyboard.isKeyPressed(KEY_ENTER)){
-                wifiConnectMenu();
-                setupGPS(ssid,pwd);
-                wifiConnected = true;
-                delay(200);
-                index++;//pular para proxima tela
-                redraw = true;
+                Serial.println("dpwo started");
+                dpwo_setup();
             }
         }
-
-        
     }
 }
