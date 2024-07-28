@@ -147,7 +147,7 @@ void loop()
         if(Keyboard.isChange()){
             if(Keyboard.isKeyPressed(KEY_ENTER)){
                 Serial.println("dpwo started");
-                dpwo_setup();
+                dpwoRun();
             }
         }
     }
