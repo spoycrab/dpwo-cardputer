@@ -34,6 +34,7 @@ String pwd;
 #include "settings.h"
 #include "Wire.h"
 #include "gps.h"
+#include "dpwo.h"
 
 void setup()
 {
@@ -55,7 +56,7 @@ void setup()
     resetTftDisplay();
 
     getBrightness();
-    setBrightness(10);
+    setBrightness(30);
 }
 
 void loop()
@@ -68,6 +69,50 @@ void loop()
         // if(wifiConnected){
         //     server.handleClient();
         // }
+
+        switch (index){
+            case 0://Intro
+                if(redraw){drawIntro();redraw = false;}
+                Keyboard.update();
+                if (Keyboard.isChange()){
+                    if (Keyboard.isKeyPressed(KEY_ENTER))
+                    {
+                        dpwoSetup();
+                        index++; // pular tela
+                        redraw = true;
+
+                    }
+                }
+            break;
+            case 1://info DPWO
+                if(redraw){drawMainBorder();redraw = false;}
+                drawDPWOinfo();
+                Keyboard.update();
+                if (Keyboard.isChange()){
+                    if (Keyboard.isKeyPressed(KEY_ENTER))
+                    {
+                        dpwoRun();
+                        index++; // pular tela
+                        redraw = true;
+                    }
+                }
+            break;
+            case 2://Redes SD
+                if(redraw){drawMainBorder();redraw = false;}
+                drawSDinfo();
+                Keyboard.update();
+                if (Keyboard.isChange())
+                {
+                    if (Keyboard.isKeyPressed(KEY_ENTER))
+                    {
+                        index--; //retornar tela
+                        redraw = true;
+                    }
+                }
+            break;
+        }
+
+
         // switch (index){
         //     case 0:                  
         //         if(redraw){drawIntro();redraw = false;}
@@ -87,8 +132,9 @@ void loop()
         //             }
         //         }
         //         break;
-        //     case 1:
-        //         if(redraw){drawGPSInfo();redraw = false;}
+        //     case 1://GPS
+        //         if(redraw){drawMainBorder();redraw = false;}
+        //         drawGPSInfo();
         //         Keyboard.update();
         //         if (Keyboard.isChange())
         //         {
@@ -100,8 +146,9 @@ void loop()
         //             }
         //         }
         //         break;
-        //     case 2: //teste
-        //         if(redraw){drawDPWOinfo();redraw = false;}
+        //     case 2: //DPWO
+        //         if(redraw){drawMainBorder();redraw = false;}
+        //         drawDPWOinfo();
         //         Keyboard.update();
         //         if (Keyboard.isChange())
         //         {
@@ -115,40 +162,12 @@ void loop()
         //         break;
         // }
 
-
-        // switch (index){
-        //     case 0:
-        //         if(redraw)drawIntro();
-        //         redraw = false;
-        //         break;
-        //     default:
-        //         if(redraw)drawMainBorder();
-        //         drawGPSInfo();
-        //         redraw = false;
-        //         break;
-        // }
-        // delay(200);
-        
         // Keyboard.update();
         // if(Keyboard.isChange()){
         //     if(Keyboard.isKeyPressed(KEY_ENTER)){
-        //         wifiConnectMenu();
-        //         setupGPS(ssid,pwd);
-        //         wifiConnected = true;
-        //         delay(200);
-        //         index++;//pular para proxima tela
-        //         redraw = true;
-        //         Serial.println(ssid);
-        //         Serial.println(pwd);
+        //         Serial.println("dpwo started");
+        //         dpwoRun();
         //     }
         // }
-
-        Keyboard.update();
-        if(Keyboard.isChange()){
-            if(Keyboard.isKeyPressed(KEY_ENTER)){
-                Serial.println("dpwo started");
-                dpwoRun();
-            }
-        }
     }
 }

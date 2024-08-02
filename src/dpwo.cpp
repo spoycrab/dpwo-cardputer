@@ -14,8 +14,10 @@
 #include "dpwo.h"
 
 int ap_scanned = 0;
-std::vector<String> networksScanned;
+int total_scanned = 0;
 
+std::vector<std::pair<String, String>> networksSaved;
+std::vector<String> networksScanned;
 //Remove : do endereço MAC
 void parse_BSSID(char* bssid_without_colon, const char* bssid) {
   int j = 0;
@@ -43,8 +45,41 @@ void saveToCSV(const String &filename, const String &csvLine) {
   log_i("data saved");
 }
 
+void readFromCSV(const String &filename){
+  FS *fs;
+  if(setupSdCard()) fs=&SD;
+  else fs=&LittleFS;
+  File file = (*fs).open(filename);
+  if (!file) {
+    log_i("Error to open file");
+    Serial.println("Error to open file");
+    return;
+  }
+
+  while(file.available()){
+  String line = file.readStringUntil('\n');
+  int commaIndex = line.indexOf(',');
+  if(commaIndex>=0){
+    // Serial.print(line.substring(0,commaIndex)+":"+line.substring(commaIndex+1));
+    String col1 = line.substring(0, commaIndex);
+    String col2 = line.substring(commaIndex + 1);
+    networksSaved.push_back(std::make_pair(col1, col2));
+  }
+  
+  }
+  
+  
+  file.close();
+}
+
+
 bool alreadyScanned(const String& wifi_ssid) {
-  return find(networksScanned.begin(), networksScanned.end(), wifi_ssid) != networksScanned.end();
+  for (const auto& pair : networksSaved) {
+    if (pair.first == wifi_ssid) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void net_ap(int i) {
@@ -52,7 +87,6 @@ void net_ap(int i) {
   parse_BSSID(bssid_without_colon, WiFi.BSSIDstr(i).c_str());
   Serial.println("MAC addr");
   Serial.println(bssid_without_colon);
-
   char *bssid_ready = bssid_without_colon + 4;
   bssid_ready[strlen(bssid_ready)-2] = '\0';
   int ssid_length = WiFi.SSID(i).length();
@@ -63,7 +97,6 @@ void net_ap(int i) {
       Serial.println("ERROR");
   }
   WiFi.begin(WiFi.SSID(i).c_str(), bssid_ready);
-  // TODO: Dont depend on delays and compare the wifi status other way :P
   delay(2000);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.println("\nNOPE");
@@ -75,7 +108,7 @@ void net_ap(int i) {
   networksScanned.push_back(WiFi.SSID(i));
   //Salvar no SD
   String csvLine = String(WiFi.SSID(i) + "," + bssid_ready);
-  saveToCSV(SD_CREDS_PATH,csvLine);
+  saveToCSV(SD_CREDS_PATH, csvLine);
 
   WiFi.disconnect();
 
@@ -119,11 +152,17 @@ void claro_ap(int i) {
   tft.println(String(WiFi.SSID(i) + ":" + bssid_ready).c_str());
 }
 
+void dpwoSetup(){
+  readFromCSV(SD_CREDS_PATH);
+  for (const auto& pair : networksSaved) {
+      networksScanned.push_back(pair.first);
+    }
+}
 
 void dpwoRun() {
   // tft.clear();
-  tft.fillScreen(BGCOLOR);
-  tft.setCursor(0, 0);
+  // tft.fillScreen(BGCOLOR);
+  // tft.setCursor(0, 0);
   Serial.println("Scanning for DPWO...");
   WiFi.mode(WIFI_STA);
   ap_scanned = WiFi.scanNetworks();
@@ -131,19 +170,17 @@ void dpwoRun() {
 
   tft.setTextColor(FGCOLOR-0x2000);
   tft.println("Scanning for DPWO...");
-
+  //Procura por redes próximas
   if (ap_scanned == 0) {
     tft.println("no networks found");
   } else {
-
-    //TODO: add different functions to match Copel and Vivo regex on SSID also
+    //Identificar Redes Claro e Net
     std::regex net_regex("NET_.*");
     std::regex claro_regex("CLARO_.*");
-    for(const auto& str : networksScanned){
-      Serial.println(str);
-    }
 
-    //TODO: dont repeat the wifi connection process inside each function, instead work on this loop
+    for (const auto& pair : networksSaved) {
+      Serial.println(pair.first+":"+pair.second);
+    }
 
     for (int i = 0; i < ap_scanned; ++i) {
       Serial.print("\n");
@@ -162,20 +199,32 @@ void dpwoRun() {
         claro_ap(i);
 
       } else {
-        Serial.println("not vuln");
+        Serial.println("Not Vuln");
       }
+      total_scanned++;
     }
   }
 
   Serial.println("scan complete");
-  for(const auto& str : networksScanned){
-      Serial.println(str);
+  Serial.println("CSV:");
+  for (const auto& pair : networksSaved) {
+      Serial.println(pair.first+":"+pair.second);
   }
-  ap_scanned = WiFi.scanNetworks();
-
   
-  //TODO: append vulnerable APs and dont repeat the output inside a loop
-  // tft.fillScreen(BGCOLOR);
-
 }
 
+void drawDPWOinfo(){
+  tft.setTextSize(FM);
+  tft.setCursor(30,42);tft.print("Scanned: " +  String(total_scanned));
+  tft.setCursor(30,tft.getCursorY()+20);tft.print("Found: ");
+  tft.setCursor(30,tft.getCursorY()+20);tft.print("SD: ");
+}
+
+void drawSDinfo(){
+  tft.setTextSize(FP);
+  tft.setTextColor(TFT_ORANGE);
+  tft.setCursor(30,42);tft.print("CLARO_123456");
+  tft.setTextColor(TFT_BLUE);
+  tft.setCursor(tft.getCursorX()+4,tft.getCursorY());tft.print("EA38F2DF1");
+  
+}

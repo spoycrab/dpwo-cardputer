@@ -233,7 +233,7 @@ void drawMainBorder() {
     tft.fillScreen(BGCOLOR);
     setTftDisplay(12, 12, FGCOLOR, 1, BGCOLOR);
 
-    if(wifiConnected) {tft.print(WiFi.localIP());} else {tft.print("Nao Conectado");}
+    //if(wifiConnected) {tft.print(WiFi.localIP());} else {tft.print("Nao Conectado");}
 
     int i=0;
     if(wifiConnected) { drawWifiSmall(WIDTH - 90, 7); i++;}               //Draw Wifi Symbol beside battery
@@ -299,24 +299,17 @@ void drawIntro(){
   drawMainBorder();
   drawWifi(80,27);
   tft.setTextSize(FM);
-  tft.drawCentreString("Escolha a rede Wifi",tft.width()/2, tft.height()-(LH*FM+10), SMOOTH_FONT);
+  tft.drawCentreString("Escanear Redes",tft.width()/2, tft.height()-(LH*FM+10), SMOOTH_FONT);
 }
 
 void drawGPSInfo()
 {
-  drawMainBorder();
+  tft.setTextSize(FM);
   tft.setCursor(30,42);tft.print("SSID: ");if(wifiConnected) {tft.print(WiFi.SSID());}else {tft.print("Nao Conectado");}
   tft.setCursor(30,42+(1*17));tft.print("Logintude: "+ String(longitude, 7));
   tft.setCursor(30,42+(2*17));tft.print("Latitude: "+ String(latitude, 7));
-  // tft.setCursor(30,93);tft.print("teste3: 192.168.0.13");
 }
 
-void drawDPWOinfo(){
-  drawMainBorder();
-  displayRedStripe("NEGRESCO TESTE");
-  // tft.setCursor(30,42+(1*17));tft.print("TESTE NEGRESCO");
-
-}
 
 
 /***************************************************************************************

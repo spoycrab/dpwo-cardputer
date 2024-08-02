@@ -5,5 +5,7 @@
 // void net_ap(int i);
 
 // void claro_ap(int i);
-
+void dpwoSetup();
 void dpwoRun();
+void drawDPWOinfo();
+void drawSDinfo();
