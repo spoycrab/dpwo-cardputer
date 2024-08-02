@@ -80,7 +80,7 @@ void loop()
                         dpwoSetup();
                         index++; // pular tela
                         redraw = true;
-
+                        drawMainBorder();
                     }
                 }
             break;
@@ -92,7 +92,7 @@ void loop()
                     if (Keyboard.isKeyPressed(KEY_ENTER))
                     {
                         dpwoRun();
-                        index++; // pular tela
+                        // index++; // pular tela
                         redraw = true;
                     }
                 }

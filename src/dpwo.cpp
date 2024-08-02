@@ -13,12 +13,12 @@
 #include "globals.h"
 #include "dpwo.h"
 
-int ap_scanned = 0;
-int total_scanned = 0;
+int ap_scanned;
+int total_scanned;
 
 std::vector<std::pair<String, String>> networksSaved;
 std::vector<String> networksScanned;
-//Remove : do endereço MAC
+//Remove o : do endereço MAC
 void parse_BSSID(char* bssid_without_colon, const char* bssid) {
   int j = 0;
   for (int i = 0; i < strlen(bssid); ++i) {
@@ -57,29 +57,27 @@ void readFromCSV(const String &filename){
   }
 
   while(file.available()){
-  String line = file.readStringUntil('\n');
-  int commaIndex = line.indexOf(',');
-  if(commaIndex>=0){
-    // Serial.print(line.substring(0,commaIndex)+":"+line.substring(commaIndex+1));
-    String col1 = line.substring(0, commaIndex);
-    String col2 = line.substring(commaIndex + 1);
-    networksSaved.push_back(std::make_pair(col1, col2));
+    String line = file.readStringUntil('\n');
+    int commaIndex = line.indexOf(',');
+    if(commaIndex>=0){
+      // Serial.print(line.substring(0,commaIndex)+":"+line.substring(commaIndex+1));
+      String col1 = line.substring(0, commaIndex);
+      String col2 = line.substring(commaIndex + 1);
+      networksSaved.push_back(std::make_pair(col1, col2));
+    }
   }
-  
-  }
-  
-  
   file.close();
 }
 
 
 bool alreadyScanned(const String& wifi_ssid) {
-  for (const auto& pair : networksSaved) {
-    if (pair.first == wifi_ssid) {
-      return true;
-    }
-  }
-  return false;
+  return find(networksScanned.begin(), networksScanned.end(), wifi_ssid) != networksScanned.end();
+  // for (const auto& pair : networksSaved) {
+  //   if (pair.first == wifi_ssid) {
+  //     return true;
+  //   }
+  // }
+  // return false;
 }
 
 void net_ap(int i) {
@@ -153,10 +151,13 @@ void claro_ap(int i) {
 }
 
 void dpwoSetup(){
+  ap_scanned=0;
+  total_scanned=0;
+  
   readFromCSV(SD_CREDS_PATH);
   for (const auto& pair : networksSaved) {
-      networksScanned.push_back(pair.first);
-    }
+    networksScanned.push_back(pair.first);
+  }
 }
 
 void dpwoRun() {
@@ -165,11 +166,11 @@ void dpwoRun() {
   // tft.setCursor(0, 0);
   Serial.println("Scanning for DPWO...");
   WiFi.mode(WIFI_STA);
+  tft.setTextColor(FGCOLOR-0x2000);
+  tft.setCursor(30,tft.getCursorY()+30); tft.print("Scanning...");
   ap_scanned = WiFi.scanNetworks();
   Serial.println(ap_scanned);
 
-  tft.setTextColor(FGCOLOR-0x2000);
-  tft.println("Scanning for DPWO...");
   //Procura por redes próximas
   if (ap_scanned == 0) {
     tft.println("no networks found");
@@ -178,14 +179,9 @@ void dpwoRun() {
     std::regex net_regex("NET_.*");
     std::regex claro_regex("CLARO_.*");
 
-    for (const auto& pair : networksSaved) {
-      Serial.println(pair.first+":"+pair.second);
-    }
-
     for (int i = 0; i < ap_scanned; ++i) {
       Serial.print("\n");
-      Serial.print(i);
-      Serial.print("\n");
+      Serial.println(i);
       Serial.println(WiFi.SSID(i));
       if(alreadyScanned(WiFi.SSID(i))){
         Serial.println("Already Scanned");
@@ -201,11 +197,17 @@ void dpwoRun() {
       } else {
         Serial.println("Not Vuln");
       }
+      networksScanned.push_back(WiFi.SSID(i));
       total_scanned++;
     }
   }
 
   Serial.println("scan complete");
+  Serial.println("Scanned:");
+  for (const auto& str : networksScanned) {
+      Serial.println(str);
+  }
+
   Serial.println("CSV:");
   for (const auto& pair : networksSaved) {
       Serial.println(pair.first+":"+pair.second);
@@ -216,8 +218,7 @@ void dpwoRun() {
 void drawDPWOinfo(){
   tft.setTextSize(FM);
   tft.setCursor(30,42);tft.print("Scanned: " +  String(total_scanned));
-  tft.setCursor(30,tft.getCursorY()+20);tft.print("Found: ");
-  tft.setCursor(30,tft.getCursorY()+20);tft.print("SD: ");
+  tft.setCursor(30,tft.getCursorY()+20);tft.print("Found: "+ String(networksSaved.size()));
 }
 
 void drawSDinfo(){
