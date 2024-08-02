@@ -75,7 +75,7 @@ void loop()
                 if(redraw){drawIntro();redraw = false;}
                 Keyboard.update();
                 if (Keyboard.isChange()){
-                    if (Keyboard.isKeyPressed(KEY_ENTER))
+                    if (Keyboard.isKeyPressed(KEY_ENTER)||Keyboard.isKeyPressed('/'))
                     {
                         dpwoSetup();
                         index++; // pular tela
@@ -92,18 +92,21 @@ void loop()
                     if (Keyboard.isKeyPressed(KEY_ENTER))
                     {
                         dpwoRun();
-                        // index++; // pular tela
+                        redraw = true;
+                    }
+                    if (Keyboard.isKeyPressed('/')){
+                        index++; // pular tela
                         redraw = true;
                     }
                 }
             break;
             case 2://Redes SD
-                if(redraw){drawMainBorder();redraw = false;}
-                drawSDinfo();
+                if(redraw){drawSDinfo();redraw = false;}
                 Keyboard.update();
+                drawSDinfoLoop();
                 if (Keyboard.isChange())
                 {
-                    if (Keyboard.isKeyPressed(KEY_ENTER))
+                    if (Keyboard.isKeyPressed(','))
                     {
                         index--; //retornar tela
                         redraw = true;

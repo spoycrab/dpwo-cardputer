@@ -9,3 +9,4 @@ void dpwoSetup();
 void dpwoRun();
 void drawDPWOinfo();
 void drawSDinfo();
+void drawSDinfoLoop();

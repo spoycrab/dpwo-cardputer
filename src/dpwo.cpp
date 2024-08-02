@@ -12,13 +12,20 @@
 
 #include "globals.h"
 #include "dpwo.h"
+#include "display.h"
+#include "mykeyboard.h"
+
+std::vector<std::pair<String, String>> networksSaved;
+std::vector<String> networksScanned;
 
 int ap_scanned;
 int total_scanned;
 
-std::vector<std::pair<String, String>> networksSaved;
-std::vector<String> networksScanned;
-//Remove o : do endereço MAC
+int selectedItem = 0;
+int itemsPerPage = 3;
+int totalPages = (networksSaved.size() + itemsPerPage - 1) / itemsPerPage;
+
+//Remove : do endereço MAC
 void parse_BSSID(char* bssid_without_colon, const char* bssid) {
   int j = 0;
   for (int i = 0; i < strlen(bssid); ++i) {
@@ -72,12 +79,6 @@ void readFromCSV(const String &filename){
 
 bool alreadyScanned(const String& wifi_ssid) {
   return find(networksScanned.begin(), networksScanned.end(), wifi_ssid) != networksScanned.end();
-  // for (const auto& pair : networksSaved) {
-  //   if (pair.first == wifi_ssid) {
-  //     return true;
-  //   }
-  // }
-  // return false;
 }
 
 void net_ap(int i) {
@@ -153,7 +154,7 @@ void claro_ap(int i) {
 void dpwoSetup(){
   ap_scanned=0;
   total_scanned=0;
-  
+  WiFi.mode(WIFI_STA);
   readFromCSV(SD_CREDS_PATH);
   for (const auto& pair : networksSaved) {
     networksScanned.push_back(pair.first);
@@ -161,19 +162,17 @@ void dpwoSetup(){
 }
 
 void dpwoRun() {
-  // tft.clear();
-  // tft.fillScreen(BGCOLOR);
-  // tft.setCursor(0, 0);
   Serial.println("Scanning for DPWO...");
-  WiFi.mode(WIFI_STA);
   tft.setTextColor(FGCOLOR-0x2000);
   tft.setCursor(30,tft.getCursorY()+30); tft.print("Scanning...");
   ap_scanned = WiFi.scanNetworks();
   Serial.println(ap_scanned);
 
   //Procura por redes próximas
-  if (ap_scanned == 0) {
-    tft.println("no networks found");
+  if (ap_scanned <= 0) {
+    // tft.println("no networks found");
+    displayError("no networks found");
+    delay(800);
   } else {
     //Identificar Redes Claro e Net
     std::regex net_regex("NET_.*");
@@ -212,7 +211,7 @@ void dpwoRun() {
   for (const auto& pair : networksSaved) {
       Serial.println(pair.first+":"+pair.second);
   }
-  
+  ap_scanned = WiFi.scanNetworks();
 }
 
 void drawDPWOinfo(){
@@ -222,10 +221,47 @@ void drawDPWOinfo(){
 }
 
 void drawSDinfo(){
-  tft.setTextSize(FP);
-  tft.setTextColor(TFT_ORANGE);
-  tft.setCursor(30,42);tft.print("CLARO_123456");
-  tft.setTextColor(TFT_BLUE);
-  tft.setCursor(tft.getCursorX()+4,tft.getCursorY());tft.print("EA38F2DF1");
-  
+//   networksSaved = {
+//     {"CLARO_2GB932E1", "E7B932E1"},
+//     {"CLARO_2G9AC2FF", "3B9AC9FF"},
+//     {"CLARO_2G999237", "3B999D37"},
+//     {"CLARO_2G6D725F", "376D7F5F"},
+//     {"CLARO_2GFF321A", "41FF301A"}
+// };
+  tft.fillScreen(TFT_BLACK);
+  int startItem = (selectedItem / itemsPerPage) * itemsPerPage;
+  for (int i = 0; i < itemsPerPage; i++) {
+    int index = startItem + i;
+    if (index >= networksSaved.size()) break;
+    tft.setTextSize(FM);
+    if (index == selectedItem) {
+        tft.setTextColor(TFT_GREENYELLOW); // Destaque para o item selecionado
+    } else {
+        tft.setTextColor(FGCOLOR);
+    }
+    Serial.println(networksSaved[index].first.c_str());
+    // tft.setCursor(30, (30 * i));
+    // tft.printf("%s:%s", networksSaved[index].first.c_str(), networksSaved[index].second.c_str());
+    tft.setCursor(30,(40*i)+10);tft.print(networksSaved[index].first.c_str());
+    tft.setCursor(30,(40*i)+30);tft.print(networksSaved[index].second.c_str());
+  }
+}
+void drawSDinfoLoop(){
+  if(Keyboard.isKeyPressed(';')){
+    Serial.println(selectedItem);
+    if (selectedItem > 0) {
+      selectedItem--;
+      drawSDinfo();
+    }
+    delay(200);
+  }
+
+  if(Keyboard.isKeyPressed('.')){
+    Serial.println(networksSaved.size());
+    if (selectedItem < networksSaved.size() - 1) {
+      selectedItem++;
+      drawSDinfo();
+    }
+    delay(200);
+  }
 }
