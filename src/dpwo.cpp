@@ -124,7 +124,8 @@ void dpwoSetup(){
 void dpwoRun() {
   Serial.println("Scanning for DPWO...");
   tft.setTextColor(FGCOLOR-0x2000);
-  tft.setCursor(30,tft.getCursorY()+30); tft.print("Scanning...");
+  tft.setCursor(30,tft.getCursorY()+30);
+  tft.print("Scanning...");
   ap_scanned = WiFi.scanNetworks();
   Serial.println(ap_scanned);
 
@@ -142,6 +143,10 @@ void dpwoRun() {
       Serial.print("\n");
       Serial.println(i);
       Serial.println(WiFi.SSID(i));
+      tft.fillRect(30,tft.getCursorY(),tft.width()-60,tft.fontHeight()*2,BGCOLOR);
+      tft.setCursor(30,tft.getCursorY());
+      tft.print(WiFi.SSID(i));
+      delay(500);
       if(alreadyScanned(WiFi.SSID(i))){
         Serial.println("Already Scanned");
         continue;
