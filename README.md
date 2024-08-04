@@ -1,6 +1,6 @@
-# Default Password Owner para cardputer
+# Default Password WiFi Owner para cardputer
 
-Este projeto utiliza um ESP32 (Cardputer) para escanear redes Wi-Fi próximas e verificar se há falhas de segurança em certos modelos de roteadores (Claro e NET).
+Este projeto utiliza um ESP32 (Cardputer) para escanear redes Wi-Fi próximas e verificar se há falhas de segurança em certos modelos de roteadores (Claro e NET), Inspirado pelo projeto: https://github.com/caioluders/DPWO.
 
 <img src="img/card3.jpg" alt="Credentials" width="800"/>
 
