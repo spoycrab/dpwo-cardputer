@@ -1,6 +1,6 @@
 # Default Password Owner para cardputer
 
-![Imagem](url_da_imagem)
+![Imagem](img/card1.jpg)
 
 Este projeto utiliza um ESP32 (Cardputer) para escanear redes Wi-Fi próximas e verificar falhas de segurança em certos modelos de roteadores (Claro e NET).
 
