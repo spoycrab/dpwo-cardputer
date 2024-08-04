@@ -33,5 +33,5 @@ Este projeto foi desenvolvido para identificar a senha padrão de certos modelos
 Você pode compilar o projeto localmente com o arquivo build.bat ou baixar o binário mais recente das releases e gravar localmente usando esptool.py
 
 ```bat
-esptool --port COM1 write_flash 0x00000 Dpwo.bin
+esptool --port COM1 write_flash 0x00000 dpwo.bin
 ```
