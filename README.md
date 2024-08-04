@@ -1,8 +1,11 @@
 # Default Password Owner para cardputer
 
-![Imagem](img/card1.jpg)
+Este projeto utiliza um ESP32 (Cardputer) para escanear redes Wi-Fi próximas e verificar se há falhas de segurança em certos modelos de roteadores (Claro e NET).
 
-Este projeto utiliza um ESP32 (Cardputer) para escanear redes Wi-Fi próximas e verificar falhas de segurança em certos modelos de roteadores (Claro e NET).
+<img src="img/card3.jpg" alt="Credentials" width="800"/>
+
+<img src="img/card1.jpg" alt="Intro" width="400"/>
+<img src="img/card2.jpg" alt="Scan" width="400"/>
 
 ## Introdução
 
@@ -14,7 +17,9 @@ Este projeto foi desenvolvido para identificar a senha padrão de certos modelos
 
 2. Logo são concatenadas as Strings de SSID e MAC para o formato da senha padrão.
 
-3. O esp tenta se conectar com a rede usando a senha descoberta, e caso obtenha sucesso, guarda o SSID e Senha no cartão microSD.
+<img src="img/password.png" alt="Passwords" width="500"/>
+
+3. O ESP32 tenta conectar-se com a rede usando a senha descoberta, e caso obtenha sucesso, guarda o SSID e Senha no cartão microSD.
 
 ## Instalação
 
@@ -22,7 +27,11 @@ Este projeto foi desenvolvido para identificar a senha padrão de certos modelos
 
 - [VSCode](https://code.visualstudio.com/)
 - [PlatformIO](https://platformio.org/)
-- [Espressif 32 Platform](https://platformio.org/platforms/espressif32)
 - [Python 3](https://www.python.org/)
+- [Esptool](https://docs.espressif.com/projects/esptool/en/latest/esp32/)
 
-Para compilar o código voce poderá executar o arquivo build.bat
+Você pode compilar o projeto localmente com o arquivo build.bat ou baixar o binário mais recente das releases e gravar localmente usando esptool.py
+
+```bat
+esptool --port COM1 write_flash 0x00000 Dpwo.bin
+```
