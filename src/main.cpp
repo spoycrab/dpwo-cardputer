@@ -17,13 +17,8 @@ int prog_handler;
 int rotation;
 bool sdcardMounted;
 bool wifiConnected;
-bool BLEConnected;
 bool returnToMenu;
-char timeStr[10];
-time_t localTime;
-struct tm* timeInfo;
-ESP32Time rtc;
-bool clock_set = false;
+
 String ssid;
 String pwd;
 
@@ -43,7 +38,6 @@ void setup()
     prog_handler = 0;
     sdcardMounted = false;
     wifiConnected = false;
-    BLEConnected = false;
 
     latitude = 0.0;
     longitude = 0.0;
@@ -66,10 +60,6 @@ void loop()
     int opt = 6;
     while (1)
     {
-        // if(wifiConnected){
-        //     server.handleClient();
-        // }
-
         switch (index){
             case 0://Intro
                 if(redraw){drawIntro();redraw = false;}
@@ -115,62 +105,5 @@ void loop()
             break;
         }
 
-
-        // switch (index){
-        //     case 0:                  
-        //         if(redraw){drawIntro();redraw = false;}
-        //         Keyboard.update();
-        //         if (Keyboard.isChange())
-        //         {
-        //             if (Keyboard.isKeyPressed(KEY_ENTER))
-        //             {
-        //                 wifiConnectMenu();
-        //                 setupGPS(ssid, pwd);
-        //                 wifiConnected = true;
-        //                 delay(200);
-        //                 index++; // pular para proxima tela
-        //                 redraw = true;
-        //                 Serial.println(ssid);
-        //                 Serial.println(pwd);
-        //             }
-        //         }
-        //         break;
-        //     case 1://GPS
-        //         if(redraw){drawMainBorder();redraw = false;}
-        //         drawGPSInfo();
-        //         Keyboard.update();
-        //         if (Keyboard.isChange())
-        //         {
-        //             if (Keyboard.isKeyPressed(KEY_ENTER))
-        //             {
-        //                 tft.fillScreen(BGCOLOR);
-        //                 redraw = true;
-        //                 index++;
-        //             }
-        //         }
-        //         break;
-        //     case 2: //DPWO
-        //         if(redraw){drawMainBorder();redraw = false;}
-        //         drawDPWOinfo();
-        //         Keyboard.update();
-        //         if (Keyboard.isChange())
-        //         {
-        //             if (Keyboard.isKeyPressed(KEY_ENTER))
-        //             {
-        //                 tft.fillScreen(BGCOLOR);
-        //                 redraw = true;
-        //                 index--;
-        //             }
-        //         }
-        //         break;
-        // }
-
-        // Keyboard.update();
-        // if(Keyboard.isChange()){
-        //     if(Keyboard.isKeyPressed(KEY_ENTER)){
-        //         Serial.println("dpwo started");
-        //         dpwoRun();
-        //     }
-        // }
     }
 }

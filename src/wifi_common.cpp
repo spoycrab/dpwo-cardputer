@@ -47,21 +47,6 @@ bool wifiConnect(String ssid, int encryptation, bool isAP) {
 
     if(WiFi.status() == WL_CONNECTED) { 
       wifiConnected=true;
-      timeClient.begin();
-      timeClient.update();
-      if(tmz==0) timeClient.setTimeOffset(-3 * 3600);
-      if(tmz==1) timeClient.setTimeOffset(-2 * 3600);
-      if(tmz==2) timeClient.setTimeOffset(-4 * 3600);
-      if(tmz==3) timeClient.setTimeOffset(1 * 3600);
-      if(tmz==4) timeClient.setTimeOffset(8 * 3600);
-      if(tmz==5) timeClient.setTimeOffset(10 * 3600);
-      if(tmz==6) timeClient.setTimeOffset(9 * 3600);
-      if(tmz==7) timeClient.setTimeOffset(3 * 3600);
-      if(tmz==8) timeClient.setTimeOffset(2 * 3600);
-      localTime = myTZ.toLocal(timeClient.getEpochTime());
-      rtc.setTime(timeClient.getEpochTime());
-      updateTimeStr(rtc.getTimeStruct());
-      clock_set=true;
       return true;
     }
 
@@ -71,7 +56,7 @@ bool wifiConnect(String ssid, int encryptation, bool isAP) {
     IPAddress AP_GATEWAY(172, 0, 0, 1);
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(AP_GATEWAY, AP_GATEWAY, IPAddress(255, 255, 255, 0));
-    WiFi.softAP("BruceNet", "",6,0,4,false);
+    WiFi.softAP("MyNet", "",6,0,4,false);
     Serial.print("IP: "); Serial.println(WiFi.softAPIP());
     wifiConnected=true;
     return true;

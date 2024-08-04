@@ -1,7 +1,6 @@
 // Globals.h
 
 #define FGCOLOR TFT_DARKGREEN
-// extern char16_t FGCOLOR;
 #define ALCOLOR TFT_RED
 #define BGCOLOR TFT_BLACK
 
@@ -11,8 +10,6 @@
 #include <vector>
 #include <SPIFFS.h>
 
-#include <NTPClient.h>
-#include <Timezone.h>
 #include <ESP32Time.h>
 #include <EEPROM.h>
 #include <dpwo.h>
@@ -26,15 +23,6 @@
 extern TFT_eSPI tft;
 extern TFT_eSprite sprite;
 extern TFT_eSprite draw;
-
-extern char timeStr[10];
-
-extern bool clock_set;
-extern time_t localTime;
-extern struct tm* timeInfo;
-extern ESP32Time rtc;
-extern NTPClient timeClient;
-extern Timezone myTZ;
 
 extern int prog_handler;    // 0 - Flash, 1 - LittleFS, 2 - Download
 
@@ -60,16 +48,4 @@ extern const int bufSize;
 
 extern bool returnToMenu; // variável para verificação e quebrar os loops
 
-extern int IrTx;
-
-extern int IrRx;
-
-extern int RfTx;
-
-extern int RfRx;
-
-// void readFGCOLORFromEEPROM();
-
 void backToMenu();
-
-void updateTimeStr(struct tm timeInfo);

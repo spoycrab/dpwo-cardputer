@@ -1,12 +1,11 @@
 #include "display.h"
 #include "mykeyboard.h"
-// #include "wg.h" //for isConnectedWireguard to print wireguard lock
-#include "settings.h" //for timeStr
+#include "settings.h"
 #include "gps.h"
 #include <WiFi.h>
 
 
-#if defined(CARDPUTER) || defined(STICK_C_PLUS2)  //Battery Calculation
+#if defined(CARDPUTER)  //Battery Calculation
   #include <driver/adc.h>
   #include <esp_adc_cal.h>
   #include <soc/soc_caps.h>
@@ -34,14 +33,6 @@ void setTftDisplay(int x, int y, uint16_t fc, int size, uint16_t bg) {
     else if (x>=0 && y>=0)  tft.setCursor(x,y);                         // if x and y > 0, sets both
     tft.setTextSize(size);
     tft.setTextColor(fc,bg);
-}
-
-/***************************************************************************************
-** Function name: BootScreen
-** Description:   Start Display functions and display bootscreen
-***************************************************************************************/
-void initDisplay(int i) {
-  tft.drawXBitmap(1,1,bits, bits_width, bits_height,TFT_BLACK,FGCOLOR+i);
 }
 
 /***************************************************************************************
@@ -237,62 +228,10 @@ void drawMainBorder() {
 
     int i=0;
     if(wifiConnected) { drawWifiSmall(WIDTH - 90, 7); i++;}               //Draw Wifi Symbol beside battery
-    if(BLEConnected) { drawBLESmall(WIDTH - (90 + 20*i), 7); i++; }       //Draw BLE beside Wifi
-    // if(isConnectedWireguard) { drawWireguardStatus(WIDTH - (90 + 21*i), 7); i++; }//Draw Wg bedide BLE, if the others exist, if not, beside battery
     
-
     tft.drawRoundRect(5, 5, WIDTH - 10, HEIGHT - 10, 5, FGCOLOR);
     tft.drawLine(5, 25, WIDTH - 6, 25, FGCOLOR);
     drawBatteryStatus();
-}
-
-/***************************************************************************************
-** Function name: drawMainMenu
-** Description:   Função para desenhar e mostrar o menu principal
-***************************************************************************************/
-void drawMainMenu(int index) {
-    const int border = 10;
-    const uint16_t colors[6] = {        
-        static_cast<uint16_t>(FGCOLOR), 
-        static_cast<uint16_t>(FGCOLOR), 
-        static_cast<uint16_t>(FGCOLOR), 
-        static_cast<uint16_t>(sdcardMounted ? FGCOLOR : TFT_DARKGREY), 
-        static_cast<uint16_t>(FGCOLOR), 
-        static_cast<uint16_t>(FGCOLOR)
-    };
-
-    const char* texts[6] = { "WiFi", "BLE", "RF", "RFID", "Others", "Config" };
-
-    drawMainBorder();
-    tft.setTextSize(FG);
-
-    switch(index) {
-      case 0:
-        drawWifi(80,27);
-        break;
-      case 1:
-        drawBLE(80,27);
-        break;
-      case 2:
-        drawRf(80,27);
-        break;
-      case 3:
-        drawRfid(80,27);
-        break;
-      case 4: 
-        drawOther(80,27);
-        break;
-      case 5:
-        drawCfg(80,27);
-        break;
-    }
-    tft.setTextSize(FM);
-    tft.drawCentreString(texts[index],tft.width()/2, tft.height()-(LH*FM+10), SMOOTH_FONT);
-    tft.setTextSize(FG);
-    tft.drawChar('<',10,tft.height()/2+10);
-    tft.drawChar('>',tft.width()-(LW*FG+10),tft.height()/2+10);
-
-    
 }
 
 void drawIntro(){
@@ -366,25 +305,6 @@ void drawBatteryStatus() {
     tft.drawLine(WIDTH - 20, 9, WIDTH - 20, 9 + 13, BGCOLOR);
 }
 
-/***************************************************************************************
-** Function name: drawWireguardStatus()
-** Description:   Draws a padlock when connected
-***************************************************************************************/
-// void drawWireguardStatus(int x, int y) {
-//   draw.deleteSprite();
-//   draw.createSprite(20,17);
-//     if(isConnectedWireguard){
-//         draw.drawRoundRect(10, 0, 10, 16, 5, TFT_GREEN);
-//         draw.fillRoundRect(10, 12, 10, 5, 0, TFT_GREEN);
-//     } else {
-//     draw.drawRoundRect(1, 0, 10, 16, 5, FGCOLOR);
-//     draw.fillRoundRect(0, 12, 10, 5, 0, BGCOLOR);
-//     draw.fillRoundRect(10, 12, 10, 5, 0, FGCOLOR);
-//     }
-//   draw.pushSprite(x,y);
-//   draw.deleteSprite();
-
-// }
 
 /***************************************************************************************
 ** Function name: listFiles
@@ -422,9 +342,6 @@ void listFiles(int index, String fileList[][3]) {
     }
 }
 
-
-// desenhos do menu principal, sprite "draw" com 80x80 pixels
-
 void drawWifiSmall(int x, int y) {
   draw.deleteSprite();
   draw.createSprite(17,17);
@@ -442,69 +359,3 @@ void drawWifi(int x, int y) {
   tft.drawSmoothArc(40+x,60+y,26,20,130,230,FGCOLOR, BGCOLOR,true);
   tft.drawSmoothArc(40+x,60+y,46,40,130,230,FGCOLOR, BGCOLOR,true);
 }
-
-void drawBLESmall(int x, int y) {
-  draw.deleteSprite();
-  draw.createSprite(17,17);
-  draw.fillSprite(BGCOLOR);
-
-  draw.drawWideLine(8, 8, 4, 5, 2, FGCOLOR,BGCOLOR);
-  draw.drawWideLine(8, 8, 4, 13,2, FGCOLOR,BGCOLOR);
-  draw.drawTriangle(8, 8, 8, 0,13,4,FGCOLOR);
-  draw.drawTriangle(8, 8, 8,16,13,12,FGCOLOR);
-
-  draw.pushSprite(x,y);
-  draw.deleteSprite();
-}
-
-void drawBLE(int x, int y) {
-  tft.fillRect(x,y,80,80,BGCOLOR);
-  tft.drawWideLine(40+x,53+y,2+x,26+y,5,FGCOLOR,BGCOLOR);
-  tft.drawWideLine(40+x,26+y,2+x,53+y,5,FGCOLOR,BGCOLOR);
-  tft.fillTriangle(40+x,26+y,20+x,40+y,20+x,12+y,FGCOLOR);
-  tft.fillTriangle(40+x,53+y,20+x,40+y,20+x,68+y,FGCOLOR);
-  tft.drawArc(40+x,40+y,10,12,210,330,FGCOLOR,BGCOLOR);
-  tft.drawArc(40+x,40+y,23,25,210,330,FGCOLOR,BGCOLOR);
-  tft.drawArc(40+x,40+y,36,38,210,330,FGCOLOR,BGCOLOR);
-}
-
-void drawCfg(int x, int y) {
-  tft.fillRect(x,y,80,80,BGCOLOR);
-  int i=0;
-  for(i=0;i<6;i++) {
-    tft.drawArc(40+x,40+y,30,20,15+60*i,45+60*i,FGCOLOR,BGCOLOR,true);
-  }
-  tft.drawArc(40+x,40+y,22,8,0,360,FGCOLOR,BGCOLOR,false);
-}
-
-void drawRf(int x, int y) {
-  tft.fillRect(x,y,80,80,BGCOLOR);
-  tft.fillCircle(40+x,30+y,7,FGCOLOR);
-  tft.fillTriangle(40+x,40+y,25+x,70+y,55+x,70+y,FGCOLOR);
-  tft.drawArc(40+x,30+y,18,15,40,140,FGCOLOR,BGCOLOR);
-  tft.drawArc(40+x,30+y,28,25,40,140,FGCOLOR,BGCOLOR);
-  tft.drawArc(40+x,30+y,38,35,40,140,FGCOLOR,BGCOLOR);
-  tft.drawArc(40+x,30+y,18,15,220,320,FGCOLOR,BGCOLOR);
-  tft.drawArc(40+x,30+y,28,25,220,320,FGCOLOR,BGCOLOR);
-  tft.drawArc(40+x,30+y,38,35,220,320,FGCOLOR,BGCOLOR);
-}
-
-void drawRfid(int x, int y) {
-  tft.fillRect(x,y,80,80,BGCOLOR);
-  tft.drawRoundRect(5+x,5+y,70,70,10,FGCOLOR);
-  tft.fillRect(0+x,40+y,40,40,BGCOLOR);
-  tft.drawCircle(15+x,65+y,7,FGCOLOR);
-  tft.drawArc(15+x,65+y,18,15,180,270,FGCOLOR,BGCOLOR);
-  tft.drawArc(15+x,65+y,28,25,180,270,FGCOLOR,BGCOLOR);
-  tft.drawArc(15+x,65+y,38,35,180,270,FGCOLOR,BGCOLOR);
-}
-
-void drawOther(int x, int y) {
-  tft.fillRect(x,y,80,80,BGCOLOR);
-  tft.fillCircle(40+x,40+y,7,FGCOLOR);
-  tft.drawArc(40+x,40+y,18,15,0,340,FGCOLOR,BGCOLOR);
-  tft.drawArc(40+x,40+y,25,22,20,360,FGCOLOR,BGCOLOR);
-  tft.drawArc(40+x,40+y,32,29,0,200,FGCOLOR,BGCOLOR);
-  tft.drawArc(40+x,40+y,32,29,240,360,FGCOLOR,BGCOLOR);
-}
-
