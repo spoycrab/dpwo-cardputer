@@ -1,6 +1,6 @@
 # Default Password WiFi Owner para cardputer
 
-Este projeto utiliza um ESP32 (Cardputer) para escanear redes Wi-Fi próximas e verificar se há falhas de segurança em certos modelos de roteadores (Claro e NET). É inspirado pelo projeto: [DPWO](https://github.com/caioluders/DPWO).
+Este projeto utiliza um ESP32 [M5Stack Cardputer](https://shop.m5stack.com/products/m5stack-cardputer-kit-w-m5stamps3) para escanear redes Wi-Fi próximas e verificar se há falhas de segurança em certos modelos de roteadores (Claro e NET). É inspirado pelo projeto: [DPWO](https://github.com/caioluders/DPWO).
 
 <img src="img/card3.jpg" alt="Credentials" width="800"/>
 
